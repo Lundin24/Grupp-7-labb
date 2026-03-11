@@ -2,9 +2,8 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import mongoose from 'mongoose'
 import { Comment } from './models/Comments.js'
-import { commentSchema } from './schemas/commentSchema.js'
+// import { commentSchema } from './schemas/commentSchema.js' ska användas senare i controllers
 import { connectDB } from './db.js'
 
 dotenv.config()
@@ -31,6 +30,49 @@ app.get('/comments', async (req: Request, res: Response) => {
         res.json(comments)
     } catch (error) {
         res.status(500).json({ message: 'Could not load comments' })
+    }
+})
+
+app.get('/comments/:id', async (req: Request, res: Response) => {
+    try {
+        const comment = await Comment.findById(req.params.id)
+        if (!comment) {
+            return res.status(404).json({ message: 'Could not find comment' })
+        }
+        res.json(comment)
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' })
+    }
+})
+
+app.put('/comments/:id', async (req: Request, res: Response) => {
+    try {
+        console.log('params', req.params.id)
+        console.log('body', req.body)
+        const updatedComment = await Comment.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true }
+        )
+        if (!updatedComment) {
+            return res.status(404).json({ message: 'Could not find comment' })
+        }
+        res.status(200).json({ message: 'Comment updated successfully'})
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' })
+    }
+})
+
+app.delete('/comments/:id', async (req: Request, res: Response) => {
+    try {
+        const deletedComment = await Comment.findByIdAndDelete(req.params.id)
+        if (!deletedComment) {
+            return res.status(404).json({ message: 'Could not find comment' })
+        }
+        res.status(200).json({ message: 'Comment deleted successfully'})
+
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' })
     }
 })
 
