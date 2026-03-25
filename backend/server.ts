@@ -2,8 +2,10 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import cors from 'cors'
 
 const app = express()
+app.use(cors())
 app.use(express.json())
 
 type User = {
@@ -41,4 +43,8 @@ app.post('/login', async (req: Request, res: Response) => {
  //skyddat lösenord
  const token = jwt.sign({ username: user.username }, 'secretkey')
  res.json({ message: 'Login successful', token })
+})
+
+app.listen(1221, () => {
+ console.log('Server running on http://localhost:1221')
 })
